@@ -10,7 +10,6 @@ import numpy as np
 import torch as th
 import torch.distributed as dist
 import sys
-sys.path.append('/data/GAN_project/scripts')
 
 from improved_diffusion import dist_util, logger
 from improved_diffusion.script_util import (
@@ -23,8 +22,9 @@ from improved_diffusion.script_util import (
 
 
 def main(model_path, output_path, diffusion_steps, patch_size, images_num):
-    os.environ["OPENAI_LOGDIR"] = output_path
     args = create_argparser(model_path,images_num).parse_args()
+    os.environ["OPENAI_LOGDIR"] = args.logdir + datetime.datetime.now().strftime(
+        "model_sample-%Y-%m-%d-%H-%M-%S-%f")
 
     dist_util.setup_dist()
     logger.configure()
@@ -101,6 +101,7 @@ def create_argparser(model_path, images_num):
         batch_size=10,
         use_ddim=False,
         model_path=model_path,
+        logdir='',
         # image_size=64,
         # num_channels=64,
         # num_res_blocks=1,
@@ -113,30 +114,4 @@ def create_argparser(model_path, images_num):
 
 
 if __name__ == "__main__":
-    import numpy as np
-    import matplotlib.pyplot as plt
-
-    model_path = "/data/GAN_project/diffusion_tries/mitochondria/tav/openai-2023-04-25-18-02-13-010307/ema_0.9999_080000.pt"
-    #main(model_path, output_path, diffusion_steps=2000, patch_size=256, images_num=10)
-    # with np.load('/data/GAN_project/diffusion_tries/samples/openai-2023-04-26-15-04-29-012512/samples_10x256x256x3.npz') as data:
-    #    lst = data.files
-    #    for item in data[lst[0]]:
-    #        plt.imshow(item)
-    #        plt.show()
-    patch_size = 256
-    diffusion_steps = 2000 #2000
-    model_path = '/data/GAN_project/diffusion_tries/mitochondria/shareloc/openai-2023-06-30-08-38-22-542186/ema_0.9999_148000.pt'
-    model_path = '/data/GAN_project/diffusion_tries/mitochondria/shareloc/7_imgsopenai-2023-07-06-19-38-06-665622/ema_0.9999_080000.pt'
-
-    model_path ='/data/GAN_project/diffusion_tries/mitochondria/shareloc/7_imgs_not_saturated_openai-2023-07-15-09-25-31-059997/ema_0.9999_062000.pt'
-    for i in range(1, 10):
-        #output_path = "/data/GAN_project/diffusion_tries/samples/mitochondria/1106/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
-        output_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/shareloc/7imgs_not_saturated1507' + datetime.datetime.now().strftime(
-            "openai-%Y-%m-%d-%H-%M-%S-%f")
-        images_num = 300
-        main(model_path, output_path, diffusion_steps, patch_size, images_num)
-    # output_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/shareloc/3006'
-    #output_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/shareloc/0707_7imgs'
-    output_path = '/data/GAN_project/diffusion_tries/samples/mitochondria/shareloc/0707_7imgs_not_saturated1507_2'
-    images_num = 10
-    #main(model_path, output_path, diffusion_steps,patch_size, images_num)
+    main()

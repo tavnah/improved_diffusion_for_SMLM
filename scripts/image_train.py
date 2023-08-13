@@ -21,6 +21,10 @@ import torch
 def main():
     args = create_argparser().parse_args()
 
+    os.environ[
+        "OPENAI_LOGDIR"] = args.logdir + datetime.datetime.now().strftime(
+        "model_train-%Y-%m-%d-%H-%M-%S-%f")
+
     dist_util.setup_dist()
     logger.configure()
 
@@ -64,7 +68,7 @@ def main():
 
 
 def create_argparser():
-    defaults = dict(data_dir='/data/GAN_project/mitochondria/shareloc/tiff_files/train/patches_256x256_ol0.25',
+    defaults = dict(data_dir='',
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
@@ -74,9 +78,10 @@ def create_argparser():
         ema_rate="0.9999",  # comma-separated list of EMA values
         log_interval=500,
         save_interval=2000,
-        resume_checkpoint='/data/GAN_project/diffusion_tries/mitochondria/shareloc/7_imgs_not_saturated_openai-2023-07-14-17-47-43-452007/ema_0.9999_070000.pt',
+        resume_checkpoint='',
         use_fp16=False,
         fp16_scale_growth=1e-3,
+        logdir = '',
 
     )
     defaults.update(model_and_diffusion_defaults())
@@ -86,9 +91,4 @@ def create_argparser():
 
 
 if __name__ == "__main__":
-    #os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/alpha_tubulin_scale_4/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
-    #os.environ["OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/microtubules/tav/only_good_imgs/" + datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
-    os.environ[
-        "OPENAI_LOGDIR"] = "/data/GAN_project/diffusion_tries/mitochondria/shareloc/7_imgs_not_saturated_" + datetime.datetime.now().strftime(
-        "openai-%Y-%m-%d-%H-%M-%S-%f")
     main()
