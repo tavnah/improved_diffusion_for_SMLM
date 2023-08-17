@@ -6,16 +6,16 @@ import argparse
 import os
 import numpy as np
 import datetime
-from improved_diffusion import dist_util, logger
-from improved_diffusion.image_datasets import load_data
-from improved_diffusion.resample import create_named_schedule_sampler
-from improved_diffusion.script_util import (
+from improved_diffusion_for_SMLM.improved_diffusion import dist_util, logger
+from improved_diffusion_for_SMLM.improved_diffusion.image_datasets import load_data
+from improved_diffusion_for_SMLM.improved_diffusion.resample import create_named_schedule_sampler
+from improved_diffusion_for_SMLM.improved_diffusion.script_util import (
     model_and_diffusion_defaults,
     create_model_and_diffusion,
     args_to_dict,
     add_dict_to_argparser,
 )
-from improved_diffusion.train_util import TrainLoop
+from improved_diffusion_for_SMLM.improved_diffusion.train_util import TrainLoop
 import torch
 
 def main():
