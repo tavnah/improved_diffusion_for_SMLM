@@ -297,6 +297,7 @@ class UNetModel(nn.Module):
     :param use_checkpoint: use gradient checkpointing to reduce memory usage.
     :param num_heads: the number of attention heads in each attention layer.
     """
+
     def __init__(
         self,
         in_channels,

@@ -134,4 +134,5 @@ def create_argparser():
 
 
 if __name__ == "__main__":
-    main_args()
+    #main_args()
+    main(model_path='/data/GAN_project/zerocost/improved_diffusion_for_SMLM/scripts/ema_0.9999_046000.pt')

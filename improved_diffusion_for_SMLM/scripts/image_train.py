@@ -21,7 +21,7 @@ import torch
 def main_args():
     args = create_argparser().parse_args()
     args_dict = args_to_dict(args, model_and_diffusion_defaults().keys())
-    main(**args_dict)
+    main(**args_dict, logdir=args.logdir, data_dir=args.data_dir)
 
 def main(logdir='',data_dir='', image_size=64, num_channels = 64, num_res_blocks = 1, num_heads = 4, num_heads_upsample = -1,
          attention_resolutions = '16,8', dropout = 0.0, learn_sigma = False, sigma_small = False, class_cond = False,
@@ -97,7 +97,7 @@ def main(logdir='',data_dir='', image_size=64, num_channels = 64, num_res_blocks
 
 
 def create_argparser():
-    defaults = dict(data_dir='',
+    defaults = dict(data_dir='/data/GAN_project/mitochondria/shareloc/tiff_files/train/patches_256x256_ol0.25',
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
@@ -121,3 +121,4 @@ def create_argparser():
 
 if __name__ == "__main__":
     main_args()
+    #main(data_dir='/data/GAN_project/mitochondria/shareloc/tiff_files/train/patches_256x256_ol0.25', image_size=64)
