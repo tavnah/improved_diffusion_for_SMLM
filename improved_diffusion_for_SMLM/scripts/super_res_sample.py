@@ -11,8 +11,8 @@ import numpy as np
 import torch as th
 import torch.distributed as dist
 
-from improved_diffusion_for_SMLM.improved_diffusion import dist_util, logger
-from improved_diffusion_for_SMLM.improved_diffusion.script_util import (
+from improved_diffusion import dist_util, logger
+from improved_diffusion.script_util import (
     sr_model_and_diffusion_defaults,
     sr_create_model_and_diffusion,
     args_to_dict,

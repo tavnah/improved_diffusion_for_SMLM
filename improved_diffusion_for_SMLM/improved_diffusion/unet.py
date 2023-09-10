@@ -7,8 +7,8 @@ import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .fp16_util import convert_module_to_f16, convert_module_to_f32
-from .nn import (
+from improved_diffusion_for_SMLM.improved_diffusion.fp16_util import convert_module_to_f16, convert_module_to_f32
+from improved_diffusion_for_SMLM.improved_diffusion.nn import (
     SiLU,
     conv_nd,
     linear,
@@ -44,6 +44,7 @@ class TimestepEmbedSequential(nn.Sequential, TimestepBlock):
                 x = layer(x, emb)
             else:
                 x = layer(x)
+
         return x
 
 

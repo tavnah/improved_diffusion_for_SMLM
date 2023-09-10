@@ -23,7 +23,8 @@ def main_args():
     args_dict = args_to_dict(args, model_and_diffusion_defaults().keys())
     main(**args_dict, logdir=args.logdir, data_dir=args.data_dir)
 
-def main(logdir='',data_dir='', image_size=64, num_channels = 64, num_res_blocks = 1, num_heads = 4, num_heads_upsample = -1,
+def main(model_name = datetime.datetime.now().strftime("model_train-%Y-%m-%d-%H-%M-%S-%f"), logdir='',data_dir='',
+         num_steps=-1, image_size=64, num_channels = 64, num_res_blocks = 1, num_heads = 4, num_heads_upsample = -1,
          attention_resolutions = '16,8', dropout = 0.0, learn_sigma = False, sigma_small = False, class_cond = False,
          diffusion_steps = 1000, noise_schedule = 'cosine', timestep_respacing = '', use_kl = False,
          predict_xstart = False, rescale_timesteps = True, rescale_learned_sigmas = True, use_checkpoint = False,
@@ -33,8 +34,8 @@ def main(logdir='',data_dir='', image_size=64, num_channels = 64, num_res_blocks
     #args = create_argparser().parse_args()
 
     os.environ[
-        "OPENAI_LOGDIR"] = logdir + datetime.datetime.now().strftime(
-        "model_train-%Y-%m-%d-%H-%M-%S-%f")
+        "OPENAI_LOGDIR"] = logdir + model_name
+        #datetime.datetime.now().strftime("model_train-%Y-%m-%d-%H-%M-%S-%f")
 
     dist_util.setup_dist()
     logger.configure()
@@ -60,7 +61,7 @@ def main(logdir='',data_dir='', image_size=64, num_channels = 64, num_res_blocks
         rescale_learned_sigmas= rescale_learned_sigmas,
         use_checkpoint= use_checkpoint,
         use_scale_shift_norm= use_scale_shift_norm,
-        #**args_to_dict(args, model_and_diffusion_defaults().keys())
+
     )
     logger.log(f"number of model parameters:{sum([np.prod(p.size()) for p in model.parameters()])}")
     logger.log(f"channel multiplier: {model.channel_mult}")
@@ -93,11 +94,12 @@ def main(logdir='',data_dir='', image_size=64, num_channels = 64, num_res_blocks
         schedule_sampler=schedule_sampler,
         weight_decay=weight_decay,
         lr_anneal_steps=lr_anneal_steps,
-    ).run_loop()
+    ).run_loop(num_steps=num_steps)
 
 
 def create_argparser():
     defaults = dict(data_dir='/data/GAN_project/mitochondria/shareloc/tiff_files/train/patches_256x256_ol0.25',
+        model_name = datetime.datetime.now().strftime("model_train-%Y-%m-%d-%H-%M-%S-%f"),
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
@@ -121,4 +123,3 @@ def create_argparser():
 
 if __name__ == "__main__":
     main_args()
-    #main(data_dir='/data/GAN_project/mitochondria/shareloc/tiff_files/train/patches_256x256_ol0.25', image_size=64)

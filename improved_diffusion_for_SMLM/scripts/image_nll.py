@@ -8,9 +8,9 @@ import os
 import numpy as np
 import torch.distributed as dist
 
-from improved_diffusion_for_SMLM.improved_diffusion import dist_util, logger
-from improved_diffusion_for_SMLM.improved_diffusion.image_datasets import load_data
-from improved_diffusion_for_SMLM.improved_diffusion.script_util import (
+from improved_diffusion import dist_util, logger
+from improved_diffusion.image_datasets import load_data
+from improved_diffusion.script_util import (
     model_and_diffusion_defaults,
     create_model_and_diffusion,
     add_dict_to_argparser,
