@@ -82,7 +82,10 @@ def create_patches_for_type(images_folder_path, patch_size, overlap, crop_start,
                     tensor_img = tensor_img*255
             patches = crop_to_patches(tensor_img, top, left, patch_height, patch_width, overlap) #maia's function
             for patch in patches:
-                augmentations = augmentation(patch, n_rotations) # 2 - only non-interpolation augmentation
+                if n_rotations == 0:
+                    augmentations = patch
+                else:
+                    augmentations = augmentation(patch, n_rotations) # 2 - only non-interpolation augmentation
                 patches_all = torch.cat((patches_all, augmentations))
             orig_images += ([image_path] * (len(patches)*4)) # 4 - number of augmentations
 
@@ -99,8 +102,9 @@ def remove_outliers(patch, q1_percentile=0.01, q3_percentile=0.99):
     iqr = q3 - q1
     patch[patch > q3 + 1.5 * iqr] = q3 + 1.5 * iqr
     patch[patch < q1 - 1.5 * iqr] = q1 - 1.5 * iqr
-    patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
-    patch = patch * 255
+    if not (np.max(patch) - np.min(patch) == 0):
+        patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
+        patch = patch * 255
     return patch
 
 def save_patches(patches, output_folder, q1_percentile=0.01, q3_percentile=0.99, patch_name="patch"):
