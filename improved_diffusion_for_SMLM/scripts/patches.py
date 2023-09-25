@@ -51,6 +51,10 @@ def augmentation(img,n_rotation):
 
     return img_augmentations
 
+def normalize(img):
+    if not (np.max(img) - np.min(img) == 0):
+        img = (img - np.min(img)) / (np.max(img) - np.min(img))
+    return img
 def create_patches_for_type(images_folder_path, patch_size, overlap, crop_start, n_rotations=2):
     '''
     The function get a folder with images, divides each image to patches, and take each patch and creates augmentations.
@@ -59,7 +63,7 @@ def create_patches_for_type(images_folder_path, patch_size, overlap, crop_start,
     '''
     patches_all = torch.tensor([])
     orig_images = []
-    images_folder = PosixPath(images_folder_path)
+    images_folder = Path(images_folder_path)
     top, left = crop_start
     patch_height, patch_width = patch_size
 
@@ -77,35 +81,35 @@ def create_patches_for_type(images_folder_path, patch_size, overlap, crop_start,
                     print("error - this file is not an image: ", image_path)
                     continue
                 convert_tensor = transforms.ToTensor()
+                img = normalize(img)
                 tensor_img = convert_tensor(img)
                 if torch.max(tensor_img) == 1:
                     tensor_img = tensor_img*255
-            patches = crop_to_patches(tensor_img, top, left, patch_height, patch_width, overlap) #maia's function
+            patches = crop_to_patches(tensor_img, top, left, patch_height, patch_width, overlap)
             for patch in patches:
                 if n_rotations == 0:
                     augmentations = patch
                 else:
                     augmentations = augmentation(patch, n_rotations) # 2 - only non-interpolation augmentation
                 patches_all = torch.cat((patches_all, augmentations))
-            orig_images += ([image_path] * (len(patches)*4)) # 4 - number of augmentations
+            orig_images += ([image_path] * (len(patches)*(n_rotations*2))) # 4 - number of augmentations
 
     return patches_all, orig_images
 
-def remove_outliers(patch, q1_percentile=0.01, q3_percentile=0.99):
+def remove_outliers(img, q1_percentile=0.01, q3_percentile=0.99):
     '''
     the function get a patch and remove the outliers, according to the q1, q3.
     and them normalize it between 0-255.
     '''
-    q1 = np.quantile(patch, q1_percentile)
-    q3 = np.quantile(patch, q3_percentile)
+    q1 = np.quantile(img, q1_percentile)
+    q3 = np.quantile(img, q3_percentile)
 
     iqr = q3 - q1
-    patch[patch > q3 + 1.5 * iqr] = q3 + 1.5 * iqr
-    patch[patch < q1 - 1.5 * iqr] = q1 - 1.5 * iqr
-    if not (np.max(patch) - np.min(patch) == 0):
-        patch = (patch - np.min(patch)) / (np.max(patch) - np.min(patch))
-        patch = patch * 255
-    return patch
+    img[img > q3 + 1.5 * iqr] = q3 + 1.5 * iqr
+    img[img < q1 - 1.5 * iqr] = q1 - 1.5 * iqr
+    img = normalize(img)
+    img = img * 255
+    return img
 
 def save_patches(patches, output_folder, q1_percentile=0.01, q3_percentile=0.99, patch_name="patch"):
     '''
